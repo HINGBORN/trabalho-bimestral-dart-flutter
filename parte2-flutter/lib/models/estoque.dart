@@ -6,17 +6,17 @@ class Estoque {
 
   Estoque({required this.categoria});
 
-  // Ex 3: Método para adicionar
+  // Ex 3: Adicionar
   void adicionar(Peca peca) {
     _pecas.add(peca);
   }
 
-  // Novo: Método para remover
+  // Remover
   void remover(Peca peca) {
     _pecas.remove(peca);
   }
 
-  // Novo: Método para atualizar
+  // Atualizar
   void atualizar(Peca pecaAntiga, Peca pecaNova) {
     final index = _pecas.indexOf(pecaAntiga);
     if (index != -1) {
@@ -24,12 +24,11 @@ class Estoque {
     }
   }
 
-  // Getter para expor a lista de forma segura (usado na Parte 2)
   List<Peca> get pecas => _pecas;
 
   int get quantidadeItens => _pecas.length;
 
-  // Ex 4: Get que devolve um valor calculado (não é guardado numa variável)
+  // Ex 4: Getter calculado
   double get valorTotal {
     double total = 0;
     for (var peca in _pecas) {

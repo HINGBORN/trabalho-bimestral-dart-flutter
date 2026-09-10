@@ -8,7 +8,7 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // Notificador global do Tema (Claro / Escuro)
+  // Notificador de tema global
   static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
   @override
@@ -20,7 +20,6 @@ class MyApp extends StatelessWidget {
           title: 'Catálogo de Peças',
           debugShowCheckedModeBanner: false,
           themeMode: currentMode,
-          // Tema Claro
           theme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.light,
@@ -30,7 +29,6 @@ class MyApp extends StatelessWidget {
               foregroundColor: Colors.white,
             ),
           ),
-          // Tema Escuro
           darkTheme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.dark,

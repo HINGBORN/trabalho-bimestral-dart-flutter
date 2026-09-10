@@ -1,9 +1,9 @@
 class Peca {
-  final String nome;
+  final String nome;           // 1: String
   final String fabricante;
-  final double preco;
-  final int quantidade;
-  final DateTime dataCadastro;
+  final double preco;          // 2: double
+  final int quantidade;        // 3: int
+  final DateTime dataCadastro; // 4: DateTime
   final String imageUrl;
 
   Peca({
@@ -16,6 +16,6 @@ class Peca {
   }) : dataCadastro = dataCadastro ?? DateTime.now();
 
   String ficha() {
-    return "$nome ($fabricante) - R\$ ${preco.toStringAsFixed(2)} - Qtd: $quantidade - Cadastrado em: ${dataCadastro.day}/${dataCadastro.month}/${dataCadastro.year}";
+    return "$nome ($fabricante) - R\$ ${preco.toStringAsFixed(2)} - Qtd: $quantidade";
   }
 }

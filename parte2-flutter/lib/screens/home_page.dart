@@ -15,11 +15,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // Ex 3 e 4: Entidade agrupadora Estoque
   final Estoque estoque = Estoque(categoria: "Reposição Automotiva");
 
   @override
   void initState() {
     super.initState();
+    // Ex 7: Inicializa obrigatoriamente com 6 itens na lista
     estoque.adicionar(Peca(
       nome: 'Pastilha de Freio', 
       fabricante: 'Cobreq', 
@@ -65,71 +67,74 @@ class _HomePageState extends State<HomePage> {
     ));
   }
 
-  void _editarPeca(Peca pecaAntiga) async {
-    final pecaEditada = await Navigator.of(context).push<Peca>(
-      MaterialPageRoute(builder: (context) => CadastroPage(pecaParaEditar: pecaAntiga)),
+  // Ex 8: Navegação passando o objeto pelo construtor da DetalhePage
+  void _abrirDetalhes(Peca peca) async {
+    final resultado = await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => DetalhePage(peca: peca)),
     );
-    if (pecaEditada != null) {
-      setState(() {
-        estoque.atualizar(pecaAntiga, pecaEditada);
-      });
-    }
-  }
 
-  void _excluirPeca(Peca peca) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Excluir Peça'),
-        content: Text('Deseja realmente remover "${peca.nome}" do estoque?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancelar'),
+    // Trata exclusão ou edição vindas da tela de Detalhes
+    if (resultado is Map && mounted) {
+      if (resultado['action'] == 'delete') {
+        setState(() {
+          estoque.remover(peca);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${peca.nome} removida com sucesso!'),
+            backgroundColor: Colors.redAccent,
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              setState(() {
-                estoque.remover(peca);
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${peca.nome} removida com sucesso!'),
-                  backgroundColor: Colors.redAccent,
-                ),
-              );
-            },
-            child: const Text('Excluir', style: TextStyle(color: Colors.redAccent)),
+        );
+      } else if (resultado['action'] == 'edit') {
+        setState(() {
+          estoque.atualizar(peca, resultado['peca']);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${resultado['peca'].nome} atualizada com sucesso!'),
+            backgroundColor: const Color(0xFF2E7D32),
           ),
-        ],
-      ),
-    );
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    // Ex 5: Scaffold com AppBar personalizada
     return Scaffold(
-      // Ex 5: AppBar Personalizada
       appBar: AppBar(
         toolbarHeight: 70,
         elevation: 0,
         backgroundColor: const Color(0xFF1E1E1E),
         title: Row(
           children: [
-            // Ícone estilizado com fundo arredondado
+            // Logo com fundo estilizado (carrega asset ou ícone reserva)
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.speed_rounded, color: Colors.white, size: 24),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  'assets/logo.png',
+                  width: 38,
+                  height: 38,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.speed_rounded,
+                    color: Colors.white,
+                    size: 26,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(width: 14),
-            // Título e Subtítulo profissional
+            // Título e Subtítulo da Marca
             const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -156,7 +161,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         actions: [
-          // Badge com contador dinâmico de itens
+          // Badge dinâmico de itens
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
@@ -177,7 +182,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const SizedBox(width: 8),
-          // Botão de alternar tema
+          // Botão de alternar tema Claro / Escuro
           IconButton(
             icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
             tooltip: isDark ? 'Modo Claro' : 'Modo Escuro',
@@ -187,7 +192,6 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(width: 8),
         ],
-        // Linha sutil na borda inferior da AppBar
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(
@@ -199,11 +203,12 @@ class _HomePageState extends State<HomePage> {
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 750),
+          // Ex 5: Column com mainAxisAlignment e crossAxisAlignment explícitos
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Dashboard de Valor Total (Ex 4 e Ex 5)
+              // Dashboard com o valor calculado no topo (Ex 4 e 5)
               Container(
                 margin: const EdgeInsets.all(16.0),
                 padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 20.0),
@@ -229,7 +234,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              // Lista de Peças (Ex 7)
+              // Ex 7: ListView.builder envolvida em Expanded
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -237,16 +242,8 @@ class _HomePageState extends State<HomePage> {
                   itemBuilder: (context, index) {
                     final peca = estoque.pecas[index];
                     return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => DetalhePage(peca: peca)),
-                        );
-                      },
-                      child: CartaoPeca(
-                        peca: peca,
-                        onEditar: () => _editarPeca(peca),
-                        onExcluir: () => _excluirPeca(peca),
-                      ),
+                      onTap: () => _abrirDetalhes(peca),
+                      child: CartaoPeca(peca: peca),
                     );
                   },
                 ),
@@ -255,11 +252,13 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
+      // Botão para abrir o Cadastro (Ex 9 e 10)
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final novaPeca = await Navigator.of(context).push<Peca>(
             MaterialPageRoute(builder: (context) => const CadastroPage()),
           );
+          // Ex 10: setState adiciona o novo item e recalcula o total
           if (novaPeca != null) {
             setState(() {
               estoque.adicionar(novaPeca);

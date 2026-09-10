@@ -11,7 +11,7 @@ class CadastroPage extends StatefulWidget {
 }
 
 class _CadastroPageState extends State<CadastroPage> {
-  // Ex 9: Controladores
+  // Ex 9: Controladores obrigatórios
   final _nomeController = TextEditingController();
   final _fabricanteController = TextEditingController();
   final _precoController = TextEditingController();
@@ -19,7 +19,6 @@ class _CadastroPageState extends State<CadastroPage> {
   @override
   void initState() {
     super.initState();
-    // Se for edição, pré-carrega os valores
     if (widget.pecaParaEditar != null) {
       _nomeController.text = widget.pecaParaEditar!.nome;
       _fabricanteController.text = widget.pecaParaEditar!.fabricante;
@@ -122,7 +121,6 @@ class _CadastroPageState extends State<CadastroPage> {
                         nome: _nomeController.text.trim().isEmpty ? 'Peça Sem Nome' : _nomeController.text,
                         fabricante: _fabricanteController.text.trim().isEmpty ? 'Genérico' : _fabricanteController.text,
                         preco: precoParsed,
-                        // Mantém quantidade e foto originais se estiver editando
                         quantidade: widget.pecaParaEditar?.quantidade ?? 1,
                         imageUrl: widget.pecaParaEditar?.imageUrl ??
                             'https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=400&auto=format&fit=crop',

@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="logo.png" alt="Logo Catálogo de Peças" width="260">
+</p>
 # Trabalho do 1º Bimestre — Programação para Dispositivos Móveis
 
 **Integrantes:** Arthur Beraldo Pelais Dos Santos   RA:252349-2024  

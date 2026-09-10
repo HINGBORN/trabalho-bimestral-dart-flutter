@@ -4,15 +4,8 @@ import '../models/peca_performance.dart';
 
 class CartaoPeca extends StatelessWidget {
   final Peca peca;
-  final VoidCallback? onEditar;
-  final VoidCallback? onExcluir;
 
-  const CartaoPeca({
-    super.key,
-    required this.peca,
-    this.onEditar,
-    this.onExcluir,
-  });
+  const CartaoPeca({super.key, required this.peca});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +28,7 @@ class CartaoPeca extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Lado Esquerdo: Imagem
+          // Foto
           ClipRRect(
             borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
             child: Image.network(
@@ -51,57 +44,20 @@ class CartaoPeca extends StatelessWidget {
               ),
             ),
           ),
-          // Lado Direito: Informações e Menu
+          // Informações
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+              padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          peca.nome,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: textColor),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      // Menu suspenso discreto com Editar e Excluir
-                      PopupMenuButton<String>(
-                        icon: Icon(Icons.more_vert, size: 20, color: isDark ? Colors.grey[400] : Colors.grey[600]),
-                        padding: EdgeInsets.zero,
-                        onSelected: (value) {
-                          if (value == 'editar' && onEditar != null) onEditar!();
-                          if (value == 'excluir' && onExcluir != null) onExcluir!();
-                        },
-                        itemBuilder: (context) => [
-                          const PopupMenuItem(
-                            value: 'editar',
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit_outlined, size: 18, color: Colors.blueAccent),
-                                SizedBox(width: 8),
-                                Text('Editar'),
-                              ],
-                            ),
-                          ),
-                          const PopupMenuItem(
-                            value: 'excluir',
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete_outline, size: 18, color: Colors.redAccent),
-                                SizedBox(width: 8),
-                                Text('Excluir'),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  Text(
+                    peca.nome,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: textColor),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     peca.fabricante,
                     style: TextStyle(fontSize: 14, color: isDark ? Colors.grey[400] : Colors.grey[600]),
@@ -131,6 +87,10 @@ class CartaoPeca extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: Icon(Icons.chevron_right, color: isDark ? Colors.white30 : Colors.black26),
           ),
         ],
       ),
