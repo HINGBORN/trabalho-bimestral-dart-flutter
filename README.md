@@ -3,7 +3,7 @@
 **Integrantes:** Arthur Beraldo Pelais Dos Santos   RA:252349-2024  
 **Turma:**  4º ESW A  
 **Professor:** Me. Gustavo Meneghetti Arcolezi  
-**Tema / Domígit add README.mdnio:** Gerenciamento de Estoque de Peças Automotivas e Performance  
+**Tema / Domínio:** Gerenciamento de Estoque de Peças Automotivas e Performance  
 
 ---
 
