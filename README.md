@@ -3,7 +3,7 @@
 </p>
 # Trabalho do 1º Bimestre — Programação para Dispositivos Móveis
 
-**Integrantes:** Arthur Beraldo Pelais Dos Santos   RA:252349-2024  
+**Integrantes:** Arthur Beraldo Pelais Dos Santos RA:252349-2024, Pedro Lucas de Jesus Fonseca RA: 273433-2024   
 **Turma:**  4º ESW A  
 **Professor:** Me. Gustavo Meneghetti Arcolezi  
 **Tema / Domínio:** Gerenciamento de Estoque de Peças Automotivas e Performance  
