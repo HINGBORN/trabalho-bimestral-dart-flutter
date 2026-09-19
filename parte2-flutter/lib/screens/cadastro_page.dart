@@ -1,10 +1,15 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:file_selector/file_selector.dart';
+import 'package:parte2_flutter/utils/imagem_peca.dart';
 import '../models/peca.dart';
 import '../models/peca_performance.dart';
 import 'package:parte2_flutter/theme/app_theme.dart';
-import '../utils/imagem_peca.dart';
+
+
 
 
 
@@ -89,49 +94,10 @@ class _CadastroPageState extends State<CadastroPage> {
   }
 
   Future<void> _trocarImagem() async {
-    final controller = TextEditingController(text: _imagemManual ?? '');
     final url = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        ),
-        title: const Text(
-          'Trocar imagem',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-        ),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          keyboardType: TextInputType.url,
-          decoration: InputDecoration(
-            labelText: 'URL da imagem',
-            hintText: 'https://...',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radius),
-            ),
-          ),
-          onSubmitted: (v) => Navigator.of(ctx).pop(v.trim()),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(''),
-            child: Text(
-              'Usar a do nome',
-              style: TextStyle(color: ctx.textMuted),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
-            child: const Text(
-              'Aplicar',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ),
+      builder: (_) => _TrocarImagemDialog(initialUrl: _imagemManual ?? ''),
     );
-    controller.dispose();
 
     if (url == null) return; // fechou sem escolher
     setState(() => _imagemManual = url.isEmpty ? null : url);
@@ -328,6 +294,110 @@ class _CadastroPageState extends State<CadastroPage> {
   }
 }
 
+class _TrocarImagemDialog extends StatefulWidget {
+  final String initialUrl;
+
+  const _TrocarImagemDialog({required this.initialUrl});
+
+  @override
+  State<_TrocarImagemDialog> createState() => _TrocarImagemDialogState();
+}
+
+class _TrocarImagemDialogState extends State<_TrocarImagemDialog> {
+  late final TextEditingController _controller;
+  String? _imagemDoDispositivo;
+
+  @override
+  void initState() {
+    super.initState();
+    final imagemInicial = ImagemPeca.isDataUrl(widget.initialUrl)
+        ? widget.initialUrl
+        : null;
+    _imagemDoDispositivo = imagemInicial;
+    _controller = TextEditingController(
+      text: imagemInicial == null ? widget.initialUrl : '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _escolherDoDispositivo() async {
+    const tipoImagem = XTypeGroup(
+      label: 'Imagens',
+      extensions: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+    );
+    final arquivo = await openFile(acceptedTypeGroups: [tipoImagem]);
+    if (arquivo == null || !mounted) return;
+
+    _controller.clear();
+    if (kIsWeb && arquivo.path.isNotEmpty) {
+      _imagemDoDispositivo = arquivo.path;
+    } else {
+      final bytes = await arquivo.readAsBytes();
+      final mime = arquivo.mimeType ?? 'image/jpeg';
+      _imagemDoDispositivo = 'data:$mime;base64,${base64Encode(bytes)}';
+    }
+    setState(() {});
+  }
+
+  String get _resultado => _imagemDoDispositivo ?? _controller.text.trim();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+      ),
+      title: const Text(
+        'Trocar imagem',
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+      ),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        keyboardType: TextInputType.url,
+        decoration: InputDecoration(
+          labelText: 'URL da imagem',
+          hintText: _imagemDoDispositivo == null
+              ? 'https://...'
+              : 'Imagem do dispositivo selecionada',
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radius),
+          ),
+          suffixIcon: IconButton(
+            onPressed: _escolherDoDispositivo,
+            tooltip: 'Escolher do dispositivo',
+            icon: const Icon(Icons.folder_open_outlined),
+          ),
+        ),
+        onChanged: (_) {
+          if (_imagemDoDispositivo != null) {
+            setState(() => _imagemDoDispositivo = null);
+          }
+        },
+        onSubmitted: (_) => Navigator.of(context).pop(_resultado),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(''),
+          child: Text('Usar a do nome', style: TextStyle(color: context.textMuted)),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(_resultado),
+          child: const Text(
+            'Aplicar',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// Miniatura da imagem que a peça vai receber, com o botão de troca.
 class _PreviaImagem extends StatelessWidget {
   final String url;
@@ -366,30 +436,41 @@ class _PreviaImagem extends StatelessWidget {
             border: Border.all(color: context.hairline),
           ),
           clipBehavior: Clip.antiAlias,
-          child: Image.network(
-            url,
-            // A key força o Flutter a recarregar quando a URL muda.
-            key: ValueKey(url),
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Icon(
-              Icons.image_not_supported_outlined,
-              size: 24,
-              color: context.textMuted,
-            ),
-            loadingBuilder: (context, child, progress) {
-              if (progress == null) return child;
-              return Center(
-                child: SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: context.textMuted.withValues(alpha: 0.5),
+          child: ImagemPeca.isDataUrl(url)
+              ? Image.memory(
+                  ImagemPeca.bytesFromDataUrl(url),
+                  key: ValueKey(url),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Icon(
+                    Icons.image_not_supported_outlined,
+                    size: 24,
+                    color: context.textMuted,
                   ),
+                )
+              : Image.network(
+                  url,
+                  key: ValueKey(url),
+                  fit: BoxFit.cover,
+                  webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
+                  errorBuilder: (_, __, ___) => Icon(
+                    Icons.image_not_supported_outlined,
+                    size: 24,
+                    color: context.textMuted,
+                  ),
+                  loadingBuilder: (context, child, progress) {
+                    if (progress == null) return child;
+                    return Center(
+                      child: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: context.textMuted.withValues(alpha: 0.5),
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         ),
         const SizedBox(width: 14),
         Expanded(

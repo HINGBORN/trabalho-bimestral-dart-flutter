@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:parte2_flutter/theme/app_theme.dart';
 import '../models/peca.dart';
 import '../models/peca_performance.dart';
+import '../utils/imagem_peca.dart';
 
 
 /// Ex 6: Cartão do item.
@@ -149,15 +150,26 @@ class _Miniatura extends StatelessWidget {
         border: Border.all(color: context.hairline),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Image.network(
-        url,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Icon(
-          Icons.settings_outlined,
-          size: 26,
-          color: context.textMuted.withValues(alpha: 0.6),
-        ),
-      ),
+      child: ImagemPeca.isDataUrl(url)
+          ? Image.memory(
+              ImagemPeca.bytesFromDataUrl(url),
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Icon(
+                Icons.settings_outlined,
+                size: 26,
+                color: context.textMuted.withValues(alpha: 0.6),
+              ),
+            )
+          : Image.network(
+              url,
+              fit: BoxFit.cover,
+              webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
+              errorBuilder: (_, __, ___) => Icon(
+                Icons.settings_outlined,
+                size: 26,
+                color: context.textMuted.withValues(alpha: 0.6),
+              ),
+            ),
     );
   }
 }

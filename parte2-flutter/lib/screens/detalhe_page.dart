@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/peca.dart';
 import '../models/peca_performance.dart';
+import '../utils/imagem_peca.dart';
 import 'cadastro_page.dart';
 import 'package:parte2_flutter/theme/app_theme.dart';
 
@@ -97,15 +98,27 @@ class DetalhePage extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   child: AspectRatio(
                     aspectRatio: 16 / 10,
-                    child: Image.network(
-                      peca.imageUrl,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => Icon(
-                        Icons.settings_outlined,
-                        size: 56,
-                        color: context.textMuted.withValues(alpha: 0.5),
-                      ),
-                    ),
+                    child: ImagemPeca.isDataUrl(peca.imageUrl)
+                        ? Image.memory(
+                            ImagemPeca.bytesFromDataUrl(peca.imageUrl),
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.settings_outlined,
+                              size: 56,
+                              color: context.textMuted.withValues(alpha: 0.5),
+                            ),
+                          )
+                        : Image.network(
+                            peca.imageUrl,
+                            fit: BoxFit.contain,
+                            webHtmlElementStrategy:
+                                WebHtmlElementStrategy.fallback,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.settings_outlined,
+                              size: 56,
+                              color: context.textMuted.withValues(alpha: 0.5),
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 20),

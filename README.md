@@ -34,3 +34,31 @@ O sistema gerencia o estoque de peças de uma oficina e loja de autopeças. O do
 | 8 | Navegação | `parte2-flutter/lib/screens/home_page.dart:89` | Toque no item abre a tela com detalhes exclusivos |
 | 9 | Formulário | `parte2-flutter/lib/screens/cadastro_page.dart:245` | Tela de cadastro com 3 campos e TextEditingController |
 | 10 | Estado | `parte2-flutter/lib/screens/home_page.dart:113` | setState adiciona o novo item e recalcula o total |
+
+## Recursos adicionais
+
+Além dos 10 exercícios, o aplicativo também possui:
+
+- cadastro e edição de peças com nome, fabricante e preço;
+- troca da imagem por uma URL externa;
+- seleção de imagem do próprio dispositivo pelo botão de pasta;
+- exibição de imagens locais na prévia, na lista e na tela de detalhes;
+- fallback HTML para imagens externas que possuem restrições de CORS no Flutter Web;
+- seleção de arquivos feita pelo pacote `file_selector`;
+- correção do fechamento do diálogo com `Esc`, sem reutilizar um `TextEditingController` descartado.
+
+### Imagens do dispositivo
+
+Ao escolher uma imagem pelo botão de pasta, o arquivo é armazenado
+temporariamente em memória. No Flutter Web, é usado o `blob:` URL fornecido
+pelo navegador; nas plataformas nativas, a imagem é convertida para uma
+`data:` URL. Por isso, a imagem fica disponível durante a execução do
+aplicativo, mas ainda não é persistida após fechar ou reiniciar o app.
+
+Para executar a parte Flutter:
+
+```bash
+cd parte2-flutter
+flutter pub get
+flutter run -d chrome
+```
